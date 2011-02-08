@@ -7,10 +7,10 @@ module AppConfig
   
   # Configure app config
   def self.configure(opts={})
-    @@options[:model]   = opts[:model]        || Setting
-    @@options[:key]     = opts[:key_field]    || 'keyname'
-    @@options[:value]   = opts[:value_field]  || 'value'
-    @@options[:format]  = opts[:format_field] || 'value_format'
+    @@options[:model]   = opts[:model]  || Setting
+    @@options[:key]     = opts[:key]    || 'keyname'
+    @@options[:value]   = opts[:value]  || 'value'
+    @@options[:format]  = opts[:format] || 'value_format'
   end
   
   # Load and process application settings
@@ -65,13 +65,20 @@ module AppConfig
   # Fetch data from model
   def self.fetch
     raise InvalidSource, 'Model is not defined!' if @@options[:model].nil?
+    raise InvalidSource, 'Model was not found!' unless @@options[:model].superclass == ActiveRecord::Base
+    
     records = {}
-    @@options[:model].send(:all).map do |c|
-      records[c.send(@@options[:key].to_sym)] = process(
-        c.send(@@options[:value].to_sym),
-        c.send(@@options[:format].to_sym)
-      )
+    
+    begin
+      @@options[:model].send(:all).map do |c|
+        records[c.send(@@options[:key].to_sym)] = process(
+          c.send(@@options[:value].to_sym),
+          c.send(@@options[:format].to_sym)
+        )
+      end
+      records
+    rescue ActiveRecord::StatementInvalid => ex
+      raise InvalidSource, ex.message
     end
-    records
   end
 end

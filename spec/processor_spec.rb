@@ -51,7 +51,7 @@ describe 'Processor' do
   end
   
   it 'should process a boolean data' do
-    ['yes', 'y', '1'].each { |v| process(v, 'boolean').should == true }
+    ['true', 'on', 'yes', 'y', '1'].each { |v| process(v, 'boolean').should == true }
     ['', 'no', 'n', '0', 'other'].each { |v| process(v, 'boolean').should == false }
   end
 end

@@ -12,7 +12,7 @@ module AppConfig
   
     # Parse boolean string
     def process_boolean(value)
-      ['yes', 'y', '1'].include?(value.to_s.downcase)
+      ['true', 'on', 'yes', 'y', '1'].include?(value.to_s.downcase)
     end
     
     # Parse hash string

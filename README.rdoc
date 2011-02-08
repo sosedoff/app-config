@@ -1,21 +1,90 @@
-= app-config
+= AppConfig
 
-Flexible and simple configuration settings for your Rails/Sinatra applications.
+AppConfig is a library to manage your (web) application dynamic settings with flexible access and configuration strategy.
 
-== NEED TO WRITE README!!!
+Primary datasource for AppConfig is an ActiveRecord model.
 
-== Contributing to app-config
- 
-* Check out the latest master to make sure the feature hasn't been implemented or the bug hasn't been fixed yet
-* Check out the issue tracker to make sure someone already hasn't requested it and/or contributed it
-* Fork the project
-* Start a feature/bugfix branch
-* Commit and push until you are happy with your contribution
-* Make sure to add tests for it. This is important so I don't break it in a future version unintentionally.
-* Please try not to mess with the Rakefile, version, or history. If you want to have your own version, or is otherwise necessary, that is fine, but please isolate to its own commit so I can cherry-pick around it.
+== Installation
+
+via rubygems (not ready yet):
+
+  gem install app-config
+  
+via github:
+
+  git clone git://github.com/sosedoff/app-config.git
+  cd app-config
+  gem build
+  gem install app-config-x.y.z.gem
+  
+== Data Formats
+
+You can use following formats:
+- String
+- Boolean
+- Array
+- Hash
+
+String format is a default format. Everything is a string by default.
+
+Boolean format is just a flag, values 'true', 'on', 'yes', 'y', '1' are equal to True. Everything else is False.
+
+Array format is a multiline text which is transformed into array. Each evelemnt will be trimmed. Empty strings are ignored.
+
+Hash format is special key-value string, "foo: bar, user: username", which is transformed into Hash instance.
+Only format "keyname: value, keyname2: value2" is supported. No nested hashes allowed.
+
+== Usage
+
+AppConfig is designed to work with ActiveRecord model. Only ActiveRecord >= 3.0.0 is supported.
+
+By default model "Setting" will be used as a data source.
+
+Here is default structure:
+
+  ActiveRecord::Schema.define do
+    create_table :settings do |t|
+      t.string :keyname
+      t.string :value
+      t.string :value_format
+    end
+  end
+
+Now, configure:
+
+  AppConfig.configure
+  
+If your settings model has a different schema, you can redefine columns:
+
+  AppConfig.configure(
+    :model  => Setting,           # define your model as a source
+    :key    => 'KEYNAME_FIELD',   # field that contains name
+    :format => 'FORMAT_FIELD',    # field that contains key format
+    :value  => 'VALUE_FIELD',     #field that contains value data
+  )
+  
+Load all settings somewhere in your application. In Rails it should be initializer file.
+
+  AppConfig.load
+  
+AppConfig gives you 2 ways to access variables:
+
+  AppConfig.my_setting      # method-like
+  AppConfig[:my_setting]    # hash-like by symbol key
+  AppConfig['my_setting']   # hash-like by string key
+  
+You can define settings items manually. NOTE: THESE KEYS WILL BE REMOVED ON RELOAD/LOAD.
+
+  AppConfig.set('KEYNAME, 'VALUE', 'FORMAT')
+  
+Everytime you change your settings on the fly, use reload:
+
+  AppConfig.reload
+  
+Cleanup everything:
+
+  AppConfig.flush
 
 == Copyright
 
-Copyright (c) 2011 Dan Sosedoff. See LICENSE.txt for
-further details.
-
+Copyright (c) 2011 Dan Sosedoff.
