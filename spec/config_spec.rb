@@ -25,13 +25,16 @@ describe 'AppConfig' do
   end
 
   it 'should have no configuration options' do
-    AppConfig.options.size.should == 0
+    AppConfig.empty?.should == true
   end
   
-  it 'should raise InvalidKeyName' do
-    proc { AppConfig.set_key('options', 'foo') }.should raise_error AppConfig::InvalidKeyName
+  it 'should raise InvalidKeyName when use system methods' do
+    keys = ['keys', 'id', 'to_s', 'empty?']
+    keys.each do |k|
+      proc { AppConfig.set_key(k, 'foo') }.should raise_error AppConfig::InvalidKeyName
+    end
   end
-  
+    
   it 'should load setting item manually' do
     AppConfig.set_key('email_notifications', 'noreply@foo.com')
     AppConfig.exist?('email_notifications').should == true
@@ -52,11 +55,12 @@ describe 'AppConfig' do
   
   it 'should erase all settings' do
     AppConfig.flush
+    AppConfig.empty?.should == true
   end
   
   it 'should load data from database' do
     AppConfig.load
-    AppConfig.options.size.should == 1
+    AppConfig.keys.size.should == 1
     AppConfig.foo.should == 'bar'
   end
   
@@ -65,7 +69,7 @@ describe 'AppConfig' do
     s.update_attribute('value', 'TEST')
     
     AppConfig.load
-    AppConfig.options.size.should == 1
+    AppConfig.keys.size.should == 1
     AppConfig.foo.should == 'TEST'
   end
 end

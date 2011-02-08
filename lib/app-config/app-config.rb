@@ -36,8 +36,13 @@ module AppConfig
   end
   
   # Returns all configuration keys
-  def self.options
+  def self.keys
     @@records.keys
+  end
+  
+  # Returns true if there are no settings available
+  def self.empty?
+    @@records.empty?
   end
   
   # Get configuration option
