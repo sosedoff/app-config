@@ -67,6 +67,14 @@ Load all settings somewhere in your application. In Rails it should be initializ
 
   AppConfig.load
   
+Configuration in Rails 3: (you can put this into environment/ENV or application.rb)
+Make sure your application does not have any critical parts depending on AppConfig at startup.
+
+  config.after_initialize do
+    AppConfig.configure(:model => Setting)
+    AppConfig.load
+  end
+
 AppConfig gives you 2 ways to access variables:
 
   AppConfig.my_setting      # method-like
