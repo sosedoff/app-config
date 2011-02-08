@@ -1,24 +1,23 @@
 module AppConfig
   module Processor
+    # Process string value
     def process_string(value)
       value.strip
     end
 
+    # Process array of strings
     def process_array(value)
       value.split("\n").map { |s| s.to_s.strip }.compact.select { |s| !s.empty? }
     end
   
+    # Parse boolean string
     def process_boolean(value)
-      case value.to_s.downcase
-        when 'yes', 'y', '1' then
-          true
-        when 'no', 'n', '0' then
-          false
-        else
-          false
-      end
+      ['yes', 'y', '1'].include?(value.to_s.downcase)
     end
-
+    
+    # Parse hash string
+    # value should be in the following format:
+    # "keyname: value, key2: value2"
     def process_hash(value)
       result = {}
       unless value.empty?
@@ -29,7 +28,8 @@ module AppConfig
       end
       result
     end
-
+    
+    # Process data value for the format
     def process(data, type)
       raise InvalidType, 'Type is invalid!' unless FORMATS.include?(type)
       send("process_#{type}".to_sym, data.to_s)
