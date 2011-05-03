@@ -40,13 +40,22 @@ AppConfig is designed to work with ActiveRecord model. Only ActiveRecord >= 3.0.
 
 By default model "Setting" will be used as a data source.
 
-Here is default structure:
+Default migration:
 
-  ActiveRecord::Schema.define do
-    create_table :settings do |t|
-      t.string :keyname
-      t.string :value
-      t.string :value_format
+  class CreateSettings < ActiveRecord::Migration
+    def self.up
+      create_table :settings do |t|
+        t.string   :keyname,       :null => false, :limit => 64
+        t.string   :name,          :null => false, :limit => 64
+        t.text     :value,         :null => false
+        t.string   :value_format,  :limit => 64,  :default => "string"
+        t.string   :description,   :limit => 512, :null => false
+        t.timestamps
+      end
+    end
+  
+    def self.down
+      drop_table :settings
     end
   end
 
@@ -72,10 +81,10 @@ Make sure your application does not have any critical parts depending on AppConf
 
   config.after_initialize do
     AppConfig.configure(:model => Setting)
-    AppConfig.load
+    AppConfig.load if Setting.table_exists?
   end
 
-AppConfig gives you 2 ways to access variables:
+AppConfig gives you 3 ways to access variables:
 
   AppConfig.my_setting      # method-like
   AppConfig[:my_setting]    # hash-like by symbol key
