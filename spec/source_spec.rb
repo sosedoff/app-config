@@ -18,7 +18,28 @@ describe 'AppConfig' do
     proc { AppConfig.load }.should raise_error AppConfig::InvalidSource
   end
   
+  it 'should validate custom source fields' do
+    AppConfig.configure(
+      :model  => Item,
+      :key    => 'name',
+      :value  => 'data',
+      :format => 'fmt'
+    )
+    
+    proc { AppConfig.load }.should_not raise_error AppConfig::InvalidSource
+    
+    AppConfig.configure(
+      :model  => Item,
+      :key    => 'fake_field',
+      :value  => 'data',
+      :format => 'fmt'
+    )
+    
+    proc { AppConfig.load }.should raise_error AppConfig::InvalidSource
+  end
+  
   it 'should load data from custom model' do
+    
     AppConfig.configure(
       :model  => Item,
       :key    => 'name',

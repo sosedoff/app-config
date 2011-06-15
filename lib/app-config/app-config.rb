@@ -12,7 +12,9 @@ module AppConfig
     'keys',
     'empty?',
     'method_missing',
-    'exist?'
+    'exist?',
+    'source_model',
+    'configuration'
   ].freeze
   
   @@options = {}
@@ -24,6 +26,11 @@ module AppConfig
     @@options[:key]     = opts[:key]    || 'keyname'
     @@options[:value]   = opts[:value]  || 'value'
     @@options[:format]  = opts[:format] || 'value_format'
+  end
+  
+  # Returns a configuration options
+  def self.configuration
+    @@options
   end
   
   # Load and process application settings
@@ -73,12 +80,25 @@ module AppConfig
     @@records.key?(key)
   end
   
+  # Returns class that defined as source
+  def self.source_model
+    @@options[:model]
+  end
+  
   protected
+  
+  # Checks the column structure of the source model
+  def self.check_structure
+    klass = @@options[:model]
+    keys = [@@options[:key], @@options[:value], @@options[:format]]
+    return (keys - klass.column_names).empty?
+  end
   
   # Fetch data from model
   def self.fetch
     raise InvalidSource, 'Model is not defined!' if @@options[:model].nil?
     raise InvalidSource, 'Model was not found!' unless @@options[:model].superclass == ActiveRecord::Base
+    raise InvalidSource, 'Model fields are invalid!' unless check_structure
     
     records = {}
     

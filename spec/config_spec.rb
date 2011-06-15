@@ -8,7 +8,13 @@ describe 'AppConfig' do
     Setting.create(:keyname => 'foo', :value => 'bar', :value_format => 'string')
     AppConfig.configure
   end
-
+  
+  it 'should validate default source fields' do
+    ['keyname', 'value', 'value_format'].each do |c|
+      AppConfig.source_model.column_names.include?(c).should == true
+    end
+  end
+  
   it 'should have no configuration options' do
     AppConfig.empty?.should == true
   end
