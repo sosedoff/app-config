@@ -12,8 +12,9 @@ class Setting < ActiveRecord::Base
   validates_uniqueness_of :keyname
 end
 
-class Item < ActiveRecord::Base
-end
+class Item < ActiveRecord::Base ; end
+
+class FakeModel ; end
 
 def establish_connection
   ActiveRecord::Base.establish_connection(
@@ -28,6 +29,16 @@ def init_settings_table
       t.string :keyname
       t.string :value
       t.string :value_format
+    end
+  end
+end
+
+def init_custom_table
+  ActiveRecord::Schema.define do
+    create_table :items do |t|
+      t.string :name
+      t.string :data
+      t.string :fmt
     end
   end
 end
