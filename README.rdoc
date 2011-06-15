@@ -6,7 +6,7 @@ Primary datasource for AppConfig is an ActiveRecord model.
 
 == Installation
 
-via rubygems (not ready yet):
+via rubygems:
 
   gem install app-config
   
