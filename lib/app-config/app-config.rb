@@ -1,7 +1,20 @@
 module AppConfig
   extend AppConfig::Processor
 
-  FORMATS = ['string', 'array', 'hash', 'boolean']
+  FORMATS = ['string', 'array', 'hash', 'boolean'].freeze
+  RESTRICTED_KEYS = [
+    'id',
+    'to_s',
+    'configure',
+    'load',
+    'flush',
+    'reload',
+    'keys',
+    'empty?',
+    'method_missing',
+    'exist?'
+  ].freeze
+  
   @@options = {}
   @@records = {}
   
@@ -31,7 +44,7 @@ module AppConfig
   
   # Manually set (or add) a key
   def self.set_key(keyname, value, format='string')
-    raise InvalidKeyName, "Invalid key name: #{keyname}" if self.respond_to?(keyname)
+    raise InvalidKeyName, "Invalid key name: #{keyname}" if RESTRICTED_KEYS.include?(keyname)
     @@records[keyname] = process(value, format)
   end
   

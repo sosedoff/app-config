@@ -1,7 +1,4 @@
-require 'helper'
-
-class Item < ActiveRecord::Base
-end
+require 'spec_helper'
 
 describe 'AppConfig' do
   before :all do

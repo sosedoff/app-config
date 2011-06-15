@@ -1,3 +1,5 @@
+require 'active_record'
+
 require 'app-config/version'
 require 'app-config/errors'
 require 'app-config/processor'

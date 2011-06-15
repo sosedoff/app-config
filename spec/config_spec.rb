@@ -1,24 +1,9 @@
-require 'helper'
-
-class Setting < ActiveRecord::Base
-  validates_presence_of   :keyname, :value, :value_format
-  validates_uniqueness_of :keyname
-end
+require 'spec_helper'
 
 describe 'AppConfig' do
   before :all do
-    ActiveRecord::Base.establish_connection(
-      :adapter => "sqlite3",
-      :database => ":memory:"
-    )
-    
-    ActiveRecord::Schema.define do
-      create_table :settings do |t|
-        t.string :keyname
-        t.string :value
-        t.string :value_format
-      end
-    end
+    establish_connection
+    init_settings_table
     
     Setting.create(:keyname => 'foo', :value => 'bar', :value_format => 'string')
     AppConfig.configure
@@ -28,8 +13,8 @@ describe 'AppConfig' do
     AppConfig.empty?.should == true
   end
   
-  it 'should raise InvalidKeyName when use system methods' do
-    keys = ['keys', 'id', 'to_s', 'empty?']
+  it 'should raise InvalidKeyName when setting value of a restricted key' do
+    keys = AppConfig::RESTRICTED_KEYS
     keys.each do |k|
       proc { AppConfig.set_key(k, 'foo') }.should raise_error AppConfig::InvalidKeyName
     end
@@ -68,7 +53,7 @@ describe 'AppConfig' do
     s = Setting.find_by_keyname('foo')
     s.update_attribute('value', 'TEST')
     
-    AppConfig.load
+    AppConfig.reload
     AppConfig.keys.size.should == 1
     AppConfig.foo.should == 'TEST'
   end
