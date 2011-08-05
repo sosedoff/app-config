@@ -1,3 +1,5 @@
+require 'active_record'
+
 module AppConfig
   extend AppConfig::Processor
 
@@ -96,8 +98,8 @@ module AppConfig
   
   # Fetch data from model
   def self.fetch
-    raise InvalidSource, 'Model is not defined!' if @@options[:model].nil?
-    raise InvalidSource, 'Model was not found!' unless @@options[:model].superclass == ActiveRecord::Base
+    raise InvalidSource, 'Model is not defined!'     if @@options[:model].nil?
+    raise InvalidSource, 'Model was not found!'      unless @@options[:model].superclass == ActiveRecord::Base
     raise InvalidSource, 'Model fields are invalid!' unless check_structure
     
     records = {}

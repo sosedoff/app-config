@@ -1,3 +1,5 @@
 module AppConfig
-  VERSION = '0.1.1'.freeze
+  unless defined?(::AppConfig::VERSION)
+    VERSION = '0.1.1'.freeze
+  end
 end
