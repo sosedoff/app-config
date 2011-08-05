@@ -46,68 +46,110 @@ AppConfig is designed to work with ActiveRecord model. Only ActiveRecord >= 3.0.
 
 By default model "Setting" will be used as a data source.
 
-Default migration:
+### Setup
 
-    class CreateSettings < ActiveRecord::Migration
-      def self.up
-        create_table :settings do |t|
-          t.string   :keyname,       :null => false, :limit => 64
-          t.string   :name,          :null => false, :limit => 64
-          t.text     :value,         :null => false
-          t.string   :value_format,  :limit => 64,  :default => "string"
-          t.string   :description,   :limit => 512, :null => false
-          t.timestamps
-        end
-      end
-  
-      def self.down
-        drop_table :settings
-      end
+In order to use AppConfig you should have a source table, similar to this:
+
+```ruby
+class CreateSettings < ActiveRecord::Migration
+  def self.up
+    create_table :settings do |t|
+      t.string   :keyname,       :null => false, :limit => 64
+      t.text     :value,         :null => false
+      t.string   :value_format,  :limit => 64,   :default => "string"
+      t.string   :name,          :limit => 64
+      t.string   :description,   :limit => 512
+      t.timestamps
     end
+  end
 
-Now, configure:
+  def self.down
+    drop_table :settings
+  end
+end
+```
 
-    AppConfig.configure
+Required columns are:
+
+- keyname
+- value
+- value_format
+
+Columns **:name** and **:description** are optional and used only for informative purpose (ex: show name and description in admin panel).
+
+There is no need in indexes since the data is being loaded only once on application start.
+
+Simple model with validations should look like this:
+
+```ruby
+class Setting < ActiveRecord::Base
+  validates_presence_of   :keyname, :value
+  validates_uniqueness_of :keyname
+end
+```
+
+### Configuration
+
+Default configuration method is:
+
+```ruby
+AppConfig.configure
+```
   
 If your settings model has a different schema, you can redefine columns:
 
-  AppConfig.configure(
-    :model  => Setting,           # define your model as a source
-    :key    => 'KEYNAME_FIELD',   # field that contains name
-    :format => 'FORMAT_FIELD',    # field that contains key format
-    :value  => 'VALUE_FIELD',     #field that contains value data
-  )
+```ruby
+AppConfig.configure(
+  :model  => Setting,           # model class name as source
+  :key    => 'KEYNAME_FIELD',   # field that contains name
+  :format => 'FORMAT_FIELD',    # field that contains key format
+  :value  => 'VALUE_FIELD',     # field that contains value data
+)
+```
   
 Load all settings somewhere in your application. In Rails it should be initializer file.
 
-    AppConfig.load
+```ruby
+AppConfig.load
+```
   
 Configuration in Rails 3: (you can put this into environment/ENV or application.rb)
 Make sure your application does not have any critical parts depending on AppConfig at startup.
 
-    config.after_initialize do
-      AppConfig.configure(:model => Setting)
-      AppConfig.load if Setting.table_exists?
-    end
+```ruby
+config.after_initialize do
+  AppConfig.configure(:model => Setting)
+  AppConfig.load if Setting.table_exists?
+end
+```
 
 AppConfig gives you 3 ways to access variables:
 
-    AppConfig.my_setting      # method-like
-    AppConfig[:my_setting]    # hash-like by symbol key
-    AppConfig['my_setting']   # hash-like by string key
+```ruby
+AppConfig.my_setting      # method-like
+AppConfig[:my_setting]    # hash-like by symbol key
+AppConfig['my_setting']   # hash-like by string key
+```
   
-You can define settings items manually. NOTE: THESE KEYS WILL BE REMOVED ON RELOAD/LOAD.
+You can define settings items manually.
+**NOTE:** *THESE KEYS WILL BE REMOVED ON RELOAD/LOAD.*
 
-    AppConfig.set_key('KEYNAME, 'VALUE', 'FORMAT')
+```ruby
+AppConfig.set_key('KEYNAME', 'VALUE', 'FORMAT')
+```
   
 Everytime you change your settings on the fly, use reload:
 
-    AppConfig.reload
+```ruby
+AppConfig.reload
+```
   
 Cleanup everything:
 
-    AppConfig.flush
+```ruby
+AppConfig.flush
+```
 
-== Copyright
+## Copyright
 
 Copyright (c) 2011 Dan Sosedoff.
