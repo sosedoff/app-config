@@ -1,6 +1,6 @@
 module AppConfig
-  class InvalidType     < Exception ; end
-  class InvalidKeyName  < Exception ; end
-  class InvalidSource   < Exception ; end
-  class UndefinedKey    < Exception ; end
+  class InvalidType     < RuntimeError ; end
+  class InvalidKeyName  < RuntimeError ; end
+  class InvalidSource   < RuntimeError ; end
+  class UndefinedKey    < RuntimeError ; end
 end
