@@ -98,7 +98,7 @@ AppConfig gives you 3 ways to access variables:
   
 You can define settings items manually. NOTE: THESE KEYS WILL BE REMOVED ON RELOAD/LOAD.
 
-  AppConfig.set('KEYNAME, 'VALUE', 'FORMAT')
+  AppConfig.set_key('KEYNAME, 'VALUE', 'FORMAT')
   
 Everytime you change your settings on the fly, use reload:
 
